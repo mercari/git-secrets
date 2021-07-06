@@ -1,6 +1,39 @@
 #!/usr/bin/env bats
 load test_helper
 
+@test "Scans commit at HEAD with secrets" {
+  setup_bad_repo_history
+  repo_run git-secrets --scan-between HEAD..HEAD
+  [ $status -eq 1 ]
+}
+
+@test "Scans commit at HEAD without secrets" {
+  setup_good_repo_history
+  repo_run git-secrets --scan-between HEAD..HEAD
+  [ $status -eq 0 ]
+}
+
+@test "Scans commit at HEAD^1 with secrets" {
+  cd $TEST_REPO
+  echo '@todo' > $TEST_REPO/history_failure.txt
+  git add -A
+  git commit -m "Bad commit"
+  from_commit=$(git rev-parse HEAD)
+  echo 'hi' > $TEST_REPO/harmless.txt
+  git add -A
+  git commit -m "Good commit"
+  cd -
+  repo_run git-secrets --scan-between "HEAD..HEAD"
+  [ $status -eq 0 ]
+  repo_run git-secrets --scan-between "${from}..HEAD"
+  [ $status -eq 1 ]
+}
+
+@test "--scan-between fails with invalid SHA1 hash" {
+  repo_run git-secrets --scan-between "abc..def"
+  [ $status -eq 1 ]
+}
+
 @test "no arguments prints usage instructions" {
   repo_run git-secrets
   [ $status -eq 0 ]

@@ -92,3 +92,12 @@ setup_good_repo() {
   git add -A
   cd -
 }
+
+# Creates a repo with a commit that does not fail
+setup_good_repo_history() {
+  cd $TEST_REPO
+  echo 'hello!' > $TEST_REPO/data.txt
+  git add -A
+  git commit -m "Testing history"
+  cd -
+}
