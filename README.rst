@@ -146,10 +146,10 @@ Each of these options must appear first on the command line.
     a colon, and then the line of text that matched.
 
 ``--scan-between``
-    Scans the repository between two given commit hashes. For example `hashA..hashB`.
-    The scan begins AFTER the first hash. So, to include `hashA`, you must specify
-    `hashA~1..hashB` as the argument. Similarly, for to scan the last commit, use:
-    `HEAD~1..HEAD`.
+    Scans the repository between two given commit hashes using [ancestory path](https://git-scm.com/docs/git-log#Documentation/git-log.txt---ancestry-path).
+    For example `hashA..hashB`. The scan begins AFTER the first hash. So, to
+    include `hashA`, you must specify `hashA~1..hashB` as the argument.
+    Similarly, for to scan the last commit, use: `HEAD~1..HEAD`.
 
 ``--list``
     Lists the ``git-secrets`` configuration for the current repo or in the global
