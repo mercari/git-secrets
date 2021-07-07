@@ -15,6 +15,7 @@ Synopsis
 
     git secrets --scan [-r|--recursive] [--cached] [--no-index] [--untracked] [<files>...]
     git secrets --scan-history
+    git secrets --scan-between hashA..hashB
     git secrets --install [-f|--force] [<target-directory>]
     git secrets --list [--global]
     git secrets --add [-a|--allowed] [-l|--literal] [--global] <pattern>
@@ -143,6 +144,12 @@ Each of these options must appear first on the command line.
     script will exit with a non-zero status. Each matched line will be written with
     the name of the file that matched, a colon, the line number that matched,
     a colon, and then the line of text that matched.
+
+``--scan-between``
+    Scans the repository between two given commit hashes. For example `hashA..hashB`.
+    The scan begins AFTER the first hash. So, to include `hashA`, you must specify
+    `hashA~1..hashB` as the argument. Similarly, for to scan the last commit, use:
+    `HEAD~1..HEAD`.
 
 ``--list``
     Lists the ``git-secrets`` configuration for the current repo or in the global
