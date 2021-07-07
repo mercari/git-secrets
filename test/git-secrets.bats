@@ -1,12 +1,6 @@
 #!/usr/bin/env bats
 load test_helper
 
-@test "--scan-between fails commit at HEAD^1 with secrets" {
-  setup_bad_repo_history
-  repo_run git-secrets --scan-between HEAD^1..HEAD
-  [ $status -eq 1 ]
-}
-
 @test "no arguments prints usage instructions" {
   repo_run git-secrets
   [ $status -eq 0 ]
@@ -78,9 +72,15 @@ load test_helper
   [ $status -eq 1 ]
 }
 
+@test "--scan-between fails commit at HEAD~1 with secrets" {
+  setup_bad_repo_history
+  repo_run git-secrets --scan-between HEAD~1..HEAD
+  [ $status -eq 1 ]
+}
+
 @test "--scan-between passes at HEAD without secrets" {
   setup_good_repo_history
-  repo_run git-secrets --scan-between HEAD^1..HEAD
+  repo_run git-secrets --scan-between HEAD~1..HEAD
   [ $status -eq 0 ]
 }
 
@@ -94,7 +94,7 @@ load test_helper
   git add -A
   git commit -m "Good commit"
   cd -
-  repo_run git-secrets --scan-between "HEAD^1..HEAD"
+  repo_run git-secrets --scan-between "HEAD~1..HEAD"
   [ $status -eq 0 ]
   repo_run git-secrets --scan-between "${from}..HEAD"
   [ $status -eq 1 ]
