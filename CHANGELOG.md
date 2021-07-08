@@ -1,6 +1,18 @@
 # CHANGELOG
 
-## 1.3.0 - 2019-02-10
+## 1.3.3 - 2021-07-08
+* `--scan-between` Ignore merges.
+* `--scan-between` Include [to]..[from] commits in scan.
+* `--scan-between` Add more tests.
+
+## 1.3.2 - 2021-07-07
+* Add `--scan-between` subcommand to traverse and scan branch state between
+  a given commit range.
+
+## 1.3.1 - 2021-07-01
+* Support for Perl-like regular expressions with git-grep.
+
+## 1.3.0 - 2019-07-01
 
 * Empty provider output is now excluded
   (https://github.com/awslabs/git-secrets/issues/34)
