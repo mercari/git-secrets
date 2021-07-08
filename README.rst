@@ -146,9 +146,11 @@ Each of these options must appear first on the command line.
     a colon, and then the line of text that matched.
 
 ``--scan-between``
-    Scans the repository between two given commits. The scan is based on
-    `first-parent <https://git-scm.com/docs/git-rev-list#Documentation/git-rev-list.txt---first-parent>`_ and `excludes merges <https://git-scm.com/docs/git-rev-list#Documentation/git-rev-list.txt---no-merges>`_. For example `hashA..hashB`. The scan is
-    inclusive of the each of the commit at both hashes. To scan the commit at
+    Scans the repository between two given commits.  For example `hashA..hashB`.
+    The scan is based on 
+    `first-parent <https://git-scm.com/docs/git-rev-list#Documentation/git-rev-list.txt---first-parent>`_
+    and `excludes merges <https://git-scm.com/docs/git-rev-list#Documentation/git-rev-list.txt---no-merges>`_. 
+    The scan is inclusive of the each of the commit at both hashes. To scan the commit at
     ``HEAD``, for example, use ``HEAD..HEAD``. To include the last two, use
     ``HEAD~1..HEAD``. All commits are resolved using ``git rev-parse``.
 
