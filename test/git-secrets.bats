@@ -72,6 +72,39 @@ load test_helper
   [ $status -eq 1 ]
 }
 
+@test "--scan-between fails commit at HEAD~1 with secrets" {
+  setup_bad_repo_history
+  repo_run git-secrets --scan-between HEAD~1..HEAD
+  [ $status -eq 1 ]
+}
+
+@test "--scan-between passes at HEAD without secrets" {
+  setup_good_repo_history
+  repo_run git-secrets --scan-between HEAD~1..HEAD
+  [ $status -eq 0 ]
+}
+
+@test "--scan-between fails, two commits, first with secrets" {
+  cd $TEST_REPO
+  echo '@todo' > $TEST_REPO/history_failure.txt
+  git add -A
+  git commit -m "Bad commit"
+  from_commit=$(git rev-parse HEAD)
+  echo 'hi' > $TEST_REPO/harmless.txt
+  git add -A
+  git commit -m "Good commit"
+  cd -
+  repo_run git-secrets --scan-between "HEAD~1..HEAD"
+  [ $status -eq 0 ]
+  repo_run git-secrets --scan-between "${from}..HEAD"
+  [ $status -eq 1 ]
+}
+
+@test "--scan-between fails with invalid SHA1 hash" {
+  repo_run git-secrets --scan-between "abc..def"
+  [ $status -eq 1 ]
+}
+
 @test "Scans recursively" {
   setup_bad_repo
   mkdir -p $TEST_REPO/foo/bar/baz
