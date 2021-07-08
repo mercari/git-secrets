@@ -12,7 +12,7 @@
 ## 1.3.1 - 2021-07-01
 * Support for Perl-like regular expressions with git-grep.
 
-## 1.3.0 - 2019-07-01
+## 1.3.0 - 2019-02-10
 
 * Empty provider output is now excluded
   (https://github.com/awslabs/git-secrets/issues/34)
