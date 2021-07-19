@@ -4,6 +4,7 @@
 * `--scan-between` Ignore merges.
 * `--scan-between` Include [to]..[from] commits in scan.
 * `--scan-between` Add more tests.
+* Fix bug causing patterns to be split by spaces rather than `\n` or `\r\n`.
 
 ## 1.3.2 - 2021-07-07
 * Add `--scan-between` subcommand to traverse and scan branch state between
