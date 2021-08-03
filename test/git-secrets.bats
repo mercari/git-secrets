@@ -72,16 +72,63 @@ load test_helper
   [ $status -eq 1 ]
 }
 
-@test "--scan-between fails commit at HEAD~1 with secrets" {
-  setup_bad_repo_history
-  repo_run git-secrets --scan-between HEAD~1..HEAD
+@test "--scan-between includes the referenced commits" {
+  cd $TEST_REPO
+  echo '@todo 1' > $TEST_REPO/history_failure_1.txt
+  git add -A
+  git commit -m "Bad commit 1"
+  echo '@todo 2' > $TEST_REPO/history_failure_2.txt
+  git add -A
+  git commit -m "Bad commit 2"
+  echo 'pass 1' > $TEST_REPO/pass_1.txt
+  git add -A
+  git commit -m "Good commit 1"
+  cd -
+  repo_run git-secrets --scan-between "HEAD..HEAD"
+  [ $status -eq 0 ]
+
+  repo_run git-secrets --scan-between "HEAD~1..HEAD~1"
   [ $status -eq 1 ]
+  [[ "${lines[1]}" =~ ^.*:history_failure_2\.txt:1:@todo[[:space:]]2$ ]]
+
+  repo_run git-secrets --scan-between "HEAD~2..HEAD~2"
+  [ $status -eq 1 ]
+  [[ "${lines[1]}" =~ ^.*:history_failure_1\.txt:1:@todo[[:space:]]1$ ]]
+
+  repo_run git-secrets --scan-between "HEAD~2..HEAD"
+  [[ "${lines[1]}" =~ ^.*:history_failure_1\.txt:1:@todo[[:space:]]1.*$ ]]
+  [[ "${lines[2]}" =~ ^.*:history_failure_2\.txt:1:@todo[[:space:]]2.*$ ]]
 }
 
-@test "--scan-between passes at HEAD without secrets" {
-  setup_good_repo_history
-  repo_run git-secrets --scan-between HEAD~1..HEAD
-  [ $status -eq 0 ]
+@test "--scan-between does not include merges" {
+  cd $TEST_REPO
+  echo '@todo include' > $TEST_REPO/history_failure_1.txt
+  git add -A
+  git commit -m "Master commit 1"
+
+  git checkout -b "new-branch"
+  touch foo
+  git add -A
+  git commit -m "New branch commit 1"
+
+  git checkout master
+  echo '@todo exclude' > $TEST_REPO/history_failure_2.txt
+  git add -A
+  git commit -m "Master commit 2"
+
+  git checkout "new-branch"
+  git merge master -m "Merge master"
+  echo '@todo include' > $TEST_REPO/history_failure_1_new_branch.txt
+  git add -A
+  git commit -m "Master commit 2"
+
+  repo_run git-secrets --scan-between "HEAD~3..HEAD"
+  [ $status -eq 1 ]
+  [[ "${lines[1]}" =~ ^.*:history_failure_1\.txt:1:@todo[[:space:]]include.*$ ]]
+  [[ "${lines[2]}" =~ ^.*:history_failure_1_new_branch\.txt:1:@todo[[:space:]]include.*$ ]]
+  for line in ${lines[*]}; do
+    [[ ! "${line}" =~ ^.*exclude.*$ ]]
+  done
 }
 
 @test "--scan-between fails, two commits, first with secrets" {
@@ -89,15 +136,26 @@ load test_helper
   echo '@todo' > $TEST_REPO/history_failure.txt
   git add -A
   git commit -m "Bad commit"
-  from_commit=$(git rev-parse HEAD)
   echo 'hi' > $TEST_REPO/harmless.txt
   git add -A
   git commit -m "Good commit"
   cd -
-  repo_run git-secrets --scan-between "HEAD~1..HEAD"
+  repo_run git-secrets --scan-between "HEAD..HEAD"
   [ $status -eq 0 ]
-  repo_run git-secrets --scan-between "${from}..HEAD"
+  repo_run git-secrets --scan-between "HEAD~1..HEAD"
   [ $status -eq 1 ]
+}
+
+@test "--scan-between fails commit at HEAD~1 with secrets" {
+  setup_bad_repo_history
+  repo_run git-secrets --scan-between HEAD..HEAD
+  [ $status -eq 1 ]
+}
+
+@test "--scan-between passes at HEAD without secrets" {
+  setup_good_repo_history
+  repo_run git-secrets --scan-between HEAD..HEAD
+  [ $status -eq 0 ]
 }
 
 @test "--scan-between fails with invalid SHA1 hash" {
